@@ -3,14 +3,17 @@ package main
 import (
 	"log"
 	"math/rand"
+	"os"
 	"time"
+
+	"github.com/aws/aws-lambda-go/lambda"
 )
 
 func main() {
-	run()
+	lambda.Start(koebuta)
 }
 
-func run() {
+func koebuta() {
 	// 複数のリソースURLに対応する
 	sites := [5]string{
 		"http://himanji.tumblr.com/rss",
@@ -27,10 +30,10 @@ func run() {
 	log.Println(len(images))
 
 	config := SlackConfig{
-		URL:       "https://hooks.slack.com/services/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",
-		Username:  "test",
-		IconEmoji: ":ghost:",
-		Channel:   "#apitest",
+		URL:       os.Getenv("KB_URL"),
+		Username:  os.Getenv("KB_USER"),
+		IconEmoji: os.Getenv("KB_ICON"),
+		Channel:   os.Getenv("KB_CHANNEL"),
 	}
 	rand.Seed(time.Now().UnixNano())
 	i := rand.Intn(len(images))

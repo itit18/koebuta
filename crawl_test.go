@@ -4,10 +4,6 @@ import (
 	"testing"
 )
 
-func TestPostDaRta(t *testing.T) {
-	PostData()
-}
-
 func TestFetchRSS(t *testing.T) {
 	html := FetchRSS("http://himanji.tumblr.com/rss")
 	expectValue := html[0]

@@ -1,18 +1,12 @@
 package main
 
 import (
-	"log"
-
-	"strings"
-
 	"bytes"
-	"net/http"
-
-	"fmt"
-
 	"encoding/json"
-
-	"net/url"
+	"fmt"
+	"log"
+	"net/http"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -38,17 +32,14 @@ func FetchRSS(url string) (imageList []string) {
 		log.Fatal(err)
 	}
 
-	//htmlないからimgタグを取得
-	//imageList = append(imageList, "hoge")
+	//html内からimgタグを取得
 	selecter := doc.Find("item description")
-	//log.Println(len(selecter.Nodes))
 	for i := range selecter.Nodes {
 		node := selecter.Eq(i)
 		text := node.Text()
 		list := fetchDescription(text)
 		imageList = append(imageList, list...)
 	}
-	//log.Println(imageList)
 
 	return imageList
 }
@@ -71,12 +62,8 @@ func PostSlack(config SlackConfig, body string) (err error) {
 
 	//送信処理
 	err = PostJSON(jsonBytes, config.URL)
-	return
-}
 
-func PostData() {
-	data := url.Values{}
-	data.Set("payload", "{hoge : \"hogehoge\"}")
+	return
 }
 
 func PostJSON(jsonBytes []byte, siteURL string) (err error) {
@@ -87,7 +74,6 @@ func PostJSON(jsonBytes []byte, siteURL string) (err error) {
 		"POST",
 		siteURL,
 		bytes.NewBuffer(jsonBytes),
-		//		bytes.NewBuffer([]byte(string(jsonBytes))),
 	)
 
 	if err != nil {
@@ -95,7 +81,6 @@ func PostJSON(jsonBytes []byte, siteURL string) (err error) {
 	}
 	// Content-Type 設定
 	req.Header.Add("Content-Type", "application/json")
-	//req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -104,8 +89,6 @@ func PostJSON(jsonBytes []byte, siteURL string) (err error) {
 	}
 	defer resp.Body.Close()
 
-	//log.Println(resp)
-	//log.Println(resp.Body)
 	return
 }
 
@@ -116,7 +99,6 @@ func CreateJSON(sendData SlackJSON) (jsonBytes []byte, err error) {
 		return
 	}
 
-	//fmt.Println(string(jsonBytes))
 	return
 }
 
@@ -129,11 +111,11 @@ func fetchDescription(text string) (imageList []string) {
 		log.Fatal(err)
 	}
 	selecter := doc.Find("img")
-	//log.Println("img: ", len(selecter.Nodes))
 	for i := range selecter.Nodes {
 		node := selecter.Eq(i)
 		text, _ := node.Attr("src")
 		imageList = append(imageList, text)
 	}
+
 	return
 }
