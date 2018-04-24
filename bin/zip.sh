@@ -1,0 +1,6 @@
+# awsアップロード用のzipファイルを作成
+
+GOOS=linux GOARCH=amd64 go build -o $1
+zip ${1}.zip ./${1}
+mv ${1}.zip /Users/itit_r/Desktop/
+rm ${1}
