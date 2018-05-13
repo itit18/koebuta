@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"fmt"
+
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
@@ -13,7 +15,7 @@ func main() {
 	lambda.Start(koebuta)
 }
 
-func koebuta() {
+func koebuta() (string, error) {
 	// 複数のリソースURLに対応する
 	sites := [5]string{
 		"http://himanji.tumblr.com/rss",
@@ -41,4 +43,6 @@ func koebuta() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	return fmt.Sprintf("success"), nil
 }
