@@ -1,12 +1,8 @@
 package main
 
 import (
+	"context"
 	"log"
-	"math/rand"
-	"os"
-	"time"
-
-	"fmt"
 
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -15,34 +11,48 @@ func main() {
 	lambda.Start(koebuta)
 }
 
-func koebuta() (string, error) {
-	// 複数のリソースURLに対応する
-	sites := [5]string{
-		"http://himanji.tumblr.com/rss",
-		"http://pocapontas.tumblr.com/rss",
-		"https://hiyayall.tumblr.com/",
-		"http://maeda-toshiie.tumblr.com/rss",
-		"http://ktminamotokr.tumblr.com/rss",
-	}
-	images := []string{} //TODO: sliceの大きさを指定するとエラーになるのはなぜ…
-	for _, v := range sites {
-		list := FetchRSS(v)
-		images = append(images, list...)
-	}
-	log.Println(len(images))
+func koebuta(ctx context.Context, params map[string]string) (res interface{}, err error) {
+	log.Print(ctx)
+	log.Print(params)
+	//return params, nil
 
-	config := SlackConfig{
-		URL:       os.Getenv("KB_URL"),
-		Username:  os.Getenv("KB_USER"),
-		IconEmoji: os.Getenv("KB_ICON"),
-		Channel:   os.Getenv("KB_CHANNEL"),
-	}
-	rand.Seed(time.Now().UnixNano())
-	i := rand.Intn(len(images))
-	err := PostSlack(config, images[i])
+	res, err = RequestAPIGW(params)
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Print(res)
 
-	return fmt.Sprintf("success"), nil
+	return res, nil
 }
+
+//
+//func _koebuta() (string, error) {
+//	sites := [5]string{
+//		"http://himanji.tumblr.com/rss",
+//		"http://pocapontas.tumblr.com/rss",
+//		"https://hiyayall.tumblr.com/",
+//		"http://maeda-toshiie.tumblr.com/rss",
+//		"http://ktminamotokr.tumblr.com/rss",
+//	}
+//	images := []string{} //TODO: sliceの大きさを指定するとエラーになるのはなぜ…
+//	for _, v := range sites {
+//		list := FetchRSS(v)
+//		images = append(images, list...)
+//	}
+//	log.Println(len(images))
+//
+//	config := SlackConfig{
+//		URL:       os.Getenv("KB_URL"),
+//		Username:  os.Getenv("KB_USER"),
+//		IconEmoji: os.Getenv("KB_ICON"),
+//		Channel:   os.Getenv("KB_CHANNEL"),
+//	}
+//	rand.Seed(time.Now().UnixNano())
+//	i := rand.Intn(len(images))
+//	err := PostSlack(config, images[i])
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	return fmt.Sprintf("success"), nil
+//}
