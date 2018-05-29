@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -68,6 +69,14 @@ func ConvertRequest(params map[string]string) (res slackRequest, err error) {
 	}
 
 	return
+}
+
+func Authentication(token string) error {
+	if token != os.Getenv("KB_SLACK_TOKEN") {
+		return errors.New("token do not match!")
+	}
+
+	return nil
 }
 
 // incoming web hook

@@ -30,6 +30,11 @@ func outGoingHook(params map[string]string) (res slackResponse, err error) {
 	}
 	log.Printf("%#v", structParams)
 
+	err = Authentication(structParams.Token)
+	if err != nil {
+		return
+	}
+
 	image, err := FetchImageURL()
 	if err != nil {
 		return
