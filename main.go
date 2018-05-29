@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 
+	"fmt"
+
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
@@ -16,13 +18,24 @@ func koebuta(ctx context.Context, params map[string]string) (res slackResponse, 
 	log.Print(ctx)
 	log.Print(params)
 
+	res, err = outGoingHook(params)
+
+	return
+}
+
+func outGoingHook(params map[string]string) (res slackResponse, err error) {
 	structParams, err := ConvertRequest(params)
 	if err != nil {
 		return
 	}
 	log.Printf("%#v", structParams)
 
-	res, err = ConvertResponse("successs")
+	image, err := FetchImageURL()
+	if err != nil {
+		return
+	}
+
+	res, err = ConvertResponse(image)
 	if err != nil {
 		return
 	}
@@ -30,34 +43,17 @@ func koebuta(ctx context.Context, params map[string]string) (res slackResponse, 
 	return
 }
 
-//
-//func _koebuta() (string, error) {
-//	sites := [5]string{
-//		"http://himanji.tumblr.com/rss",
-//		"http://pocapontas.tumblr.com/rss",
-//		"https://hiyayall.tumblr.com/",
-//		"http://maeda-toshiie.tumblr.com/rss",
-//		"http://ktminamotokr.tumblr.com/rss",
-//	}
-//	images := []string{} //TODO: sliceの大きさを指定するとエラーになるのはなぜ…
-//	for _, v := range sites {
-//		list := FetchRSS(v)
-//		images = append(images, list...)
-//	}
-//	log.Println(len(images))
-//
-//	config := SlackConfig{
-//		URL:       os.Getenv("KB_URL"),
-//		Username:  os.Getenv("KB_USER"),
-//		IconEmoji: os.Getenv("KB_ICON"),
-//		Channel:   os.Getenv("KB_CHANNEL"),
-//	}
-//	rand.Seed(time.Now().UnixNano())
-//	i := rand.Intn(len(images))
-//	err := PostSlack(config, images[i])
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//
-//	return fmt.Sprintf("success"), nil
-//}
+func inComingHook() (string, error) {
+	image, err := FetchImageURL()
+	if err != nil {
+		return "error", err
+	}
+
+	config := CreateIncomingConfig()
+	err = PostSlack(config, image)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return fmt.Sprintf("success"), nil
+}

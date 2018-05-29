@@ -56,3 +56,18 @@ func TestConvertRequest(t *testing.T) {
 		log.Printf("%#v", structParams)
 	}
 }
+
+func TestPostJSON(t *testing.T) {
+	sendData := incomingJSON{
+		Channel:   "test1",
+		Username:  "test2",
+		IconEmoji: "test3",
+		Text:      "test4",
+	}
+	val, err := CreateJSON(sendData)
+
+	err = PostJSON(val, "https://example.com/")
+	if err != nil {
+		t.Error("api clientが失敗しました")
+	}
+}

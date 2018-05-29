@@ -5,7 +5,10 @@ import (
 )
 
 func TestFetchRSS(t *testing.T) {
-	html := FetchRSS("http://himanji.tumblr.com/rss")
+	html, err := FetchRSS("http://himanji.tumblr.com/rss")
+	if err != nil {
+		t.Error("FetchRSS: error")
+	}
 	expectValue := html[0]
 	if expectValue == "" {
 		t.Error("返り値が空")
@@ -18,7 +21,7 @@ func TestFetchRSS(t *testing.T) {
 }
 
 func TestCreateJSON(t *testing.T) {
-	sendData := SlackJSON{
+	sendData := incomingJSON{
 		Channel:   "test1",
 		Username:  "test2",
 		IconEmoji: "test3",
@@ -27,20 +30,5 @@ func TestCreateJSON(t *testing.T) {
 	_, err := CreateJSON(sendData)
 	if err != nil {
 		t.Error("JSONの生成に失敗")
-	}
-}
-
-func TestPostJSON(t *testing.T) {
-	sendData := SlackJSON{
-		Channel:   "test1",
-		Username:  "test2",
-		IconEmoji: "test3",
-		Text:      "test4",
-	}
-	val, err := CreateJSON(sendData)
-
-	err = PostJSON(val, "https://example.com/")
-	if err != nil {
-		t.Error("api clientが失敗しました")
 	}
 }

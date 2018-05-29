@@ -1,5 +1,12 @@
 package main
 
+import (
+	"bytes"
+	"log"
+	"net/http"
+	"os"
+)
+
 type slackRequest struct {
 	Text        string
 	UserID      string
@@ -18,6 +25,22 @@ type slackRequest struct {
 type slackResponse struct {
 	Text string `json:"text"`
 }
+
+type SlackConfig struct {
+	URL       string
+	Channel   string
+	Username  string
+	IconEmoji string
+}
+
+type incomingJSON struct {
+	Channel   string `json:"channel"`
+	Username  string `json:"username"`
+	IconEmoji string `json:"icon_emoji"`
+	Text      string `json:"text"`
+}
+
+// outgoing web hook
 
 //slackに対応したresponse形式に変換
 func ConvertResponse(msg string) (res slackResponse, err error) {
@@ -42,6 +65,65 @@ func ConvertRequest(params map[string]string) (res slackRequest, err error) {
 		Timestamp:   params["timestamp"],
 		Token:       params["token"],
 		TriggerWord: params["trigger_word"],
+	}
+
+	return
+}
+
+// incoming web hook
+
+func PostSlack(config SlackConfig, body string) (err error) {
+
+	//送信するJSONを作成
+	sendData := incomingJSON{
+		Channel:   config.Channel,
+		Username:  config.Username,
+		IconEmoji: config.IconEmoji,
+		Text:      body,
+	}
+	jsonBytes, err := CreateJSON(sendData)
+	if err != nil {
+		return
+	}
+
+	//送信処理
+	err = PostJSON(jsonBytes, config.URL)
+
+	return
+}
+
+func PostJSON(jsonBytes []byte, siteURL string) (err error) {
+	log.Print(siteURL)
+	log.Print(string(jsonBytes))
+
+	req, err := http.NewRequest(
+		"POST",
+		siteURL,
+		bytes.NewBuffer(jsonBytes),
+	)
+
+	if err != nil {
+		return
+	}
+	// Content-Type 設定
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	return
+}
+
+func CreateIncomingConfig() (config SlackConfig) {
+	config = SlackConfig{
+		URL:       os.Getenv("KB_URL"),
+		Username:  os.Getenv("KB_USER"),
+		IconEmoji: os.Getenv("KB_ICON"),
+		Channel:   os.Getenv("KB_CHANNEL"),
 	}
 
 	return
