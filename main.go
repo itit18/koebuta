@@ -11,18 +11,23 @@ func main() {
 	lambda.Start(koebuta)
 }
 
-func koebuta(ctx context.Context, params map[string]string) (res interface{}, err error) {
+//runner
+func koebuta(ctx context.Context, params map[string]string) (res slackResponse, err error) {
 	log.Print(ctx)
 	log.Print(params)
-	//return params, nil
 
-	res, err = RequestAPIGW(params)
+	structParams, err := ConvertRequest(params)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
-	log.Print(res)
+	log.Printf("%#v", structParams)
 
-	return res, nil
+	res, err = ConvertResponse("successs")
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 //

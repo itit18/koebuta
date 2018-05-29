@@ -5,24 +5,14 @@ import (
 	"testing"
 )
 
-func TestRequestAPIGW(t *testing.T) {
-	params := map[string]string{
-		"team_domain":  "slack.domain",
-		"user_id":      "U11111111",
-		"channel_name": "TestChannel",
-		"service_id":   "111111111111",
-		"text":         "test message",
-		"timestamp":    "1526192788.000000",
-		"token":        "ABC111111111111111111111",
-		"trigger_word": "word",
-		"user_name":    "jon doe",
-		"channel_id":   "C11111111",
-		"team_id":      "T11111111",
-	}
-
-	_, err := RequestAPIGW(params)
+func TestConvertResponse(t *testing.T) {
+	result, err := ConvertResponse("test")
 	if err != nil {
-		t.Error("RequestAPIGW: error")
+		t.Error("ConvertResponse: error")
+	}
+	if result.Text != "test" {
+		t.Error("text parameter is unknown　value")
+		log.Printf("%#v", result.Text)
 	}
 }
 
@@ -43,7 +33,7 @@ func TestConvertRequest(t *testing.T) {
 
 	structParams, err := ConvertRequest(params)
 	if err != nil {
-		t.Error("RequestAPIGW: error")
+		t.Error("ConvertRequest: error")
 	}
 
 	expectParams := slackRequest{
@@ -59,10 +49,10 @@ func TestConvertRequest(t *testing.T) {
 		Token:       "ABC111111111111111111111",
 		TriggerWord: "word",
 	}
-	log.Printf("%#v", expectParams)
-	log.Printf("%#v", structParams)
 
 	if expectParams != structParams {
 		t.Error("Generated struct are not equal")
+		log.Printf("%#v", expectParams)
+		log.Printf("%#v", structParams)
 	}
 }

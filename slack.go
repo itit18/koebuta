@@ -1,7 +1,5 @@
 package main
 
-import "log"
-
 type slackRequest struct {
 	Text        string
 	UserID      string
@@ -21,18 +19,10 @@ type slackResponse struct {
 	Text string `json:"text"`
 }
 
-//AWS API GWを利用する際に必要な諸々の処理
-func RequestAPIGW(params map[string]string) (res slackResponse, err error) {
-	//paramsのコンバート
-	structParams, err := ConvertRequest(params)
-	if err != nil {
-		return res, err
-	}
-	log.Printf("%#v", structParams)
-	//tokenのチェック
-	//request用の構造体を作成
+//slackに対応したresponse形式に変換
+func ConvertResponse(msg string) (res slackResponse, err error) {
 	res = slackResponse{
-		Text: "success!",
+		Text: msg,
 	}
 
 	return
@@ -47,7 +37,7 @@ func ConvertRequest(params map[string]string) (res slackRequest, err error) {
 		ChannelID:   params["channel_id"],
 		ChannelName: params["channel_name"],
 		ServiceID:   params["service_id"],
-		TeamDomain:  params["text"],
+		TeamDomain:  params["team_domain"],
 		TeamID:      params["team_id"],
 		Timestamp:   params["timestamp"],
 		Token:       params["token"],
