@@ -1,10 +1,10 @@
 hash: c0ad36520be1f1e224f9ee3e3812780c2d955deda01857cb81565c3c3f4a0bb4
-updated: 2018-04-24T21:18:39.469313+09:00
+updated: 2018-05-13T13:56:15.92606+09:00
 imports:
 - name: github.com/andybalholm/cascadia
   version: 349dd0209470eabd9514242c688c403c0926d266
 - name: github.com/aws/aws-lambda-go
-  version: ea03c2814414b2223eff860ed2286a83ed8a195c
+  version: 4d30d0ff60440c2d0480a15747c96ee71c3c53d4
   subpackages:
   - lambda
   - lambda/messages
