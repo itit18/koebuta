@@ -36,7 +36,7 @@ func TestConvertRequest(t *testing.T) {
 		t.Error("ConvertRequest: error")
 	}
 
-	expectParams := slackRequest{
+	expectParams := SlackRequest{
 		Text:        "test message",
 		UserID:      "U11111111",
 		UserName:    "jon doe",

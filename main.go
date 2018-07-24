@@ -4,8 +4,6 @@ import (
 	"context"
 	"log"
 
-	"fmt"
-
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
@@ -13,52 +11,29 @@ func main() {
 	lambda.Start(koebuta)
 }
 
-//runner
-func koebuta(ctx context.Context, params map[string]string) (res slackResponse, err error) {
+// AWS LambdaとのI/Oのみを担当する / メソッド名はLambdaの縛りなので変えないこと
+// API GWにjsonを返す場合、stringを返すと余計なサニタイズが走ってしまうので構造体として返している
+func koebuta(ctx context.Context, params map[string]string) (res SlackResponse, err error) {
 	log.Print(ctx)
 	log.Print(params)
 
-	res, err = outGoingHook(params)
-
-	return
-}
-
-func outGoingHook(params map[string]string) (res slackResponse, err error) {
-	structParams, err := ConvertRequest(params)
-	if err != nil {
-		return
-	}
-	log.Printf("%#v", structParams)
-
-	err = Authentication(structParams.Token)
-	if err != nil {
-		return
-	}
-
-	image, err := FetchImageURL()
-	if err != nil {
-		return
-	}
-
-	res, err = ConvertResponse(image)
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-func inComingHook() (string, error) {
-	image, err := FetchImageURL()
-	if err != nil {
-		return "error", err
-	}
-
-	config := CreateIncomingConfig()
-	err = PostSlack(config, image)
+	k := Koebuta{}
+	k.SetLambdaParams(params)
+	err = k.SetMode()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return fmt.Sprintf("success"), nil
+	err = k.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err = k.FormatResponseToLambda()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Print(res)
+	return
 }

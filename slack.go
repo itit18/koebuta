@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-type slackRequest struct {
+type SlackRequest struct {
 	Text        string
 	UserID      string
 	UserName    string
@@ -23,7 +23,7 @@ type slackRequest struct {
 }
 
 //lambdaからAPI GWに返り値を渡す際にjsonフォーマットに変換されるので、key名を指定してる
-type slackResponse struct {
+type SlackResponse struct {
 	Text string `json:"text"`
 }
 
@@ -44,8 +44,8 @@ type incomingJSON struct {
 // outgoing web hook
 
 //slackに対応したresponse形式に変換
-func ConvertResponse(msg string) (res slackResponse, err error) {
-	res = slackResponse{
+func ConvertResponse(msg string) (res SlackResponse, err error) {
+	res = SlackResponse{
 		Text: msg,
 	}
 
@@ -53,8 +53,8 @@ func ConvertResponse(msg string) (res slackResponse, err error) {
 }
 
 // AWS GWから渡ってくる値はmap型なのでstructに変換する
-func ConvertRequest(params map[string]string) (res slackRequest, err error) {
-	res = slackRequest{
+func ConvertRequest(params map[string]string) (res SlackRequest, err error) {
+	res = SlackRequest{
 		Text:        params["text"],
 		UserID:      params["user_id"],
 		UserName:    params["user_name"],
@@ -73,7 +73,7 @@ func ConvertRequest(params map[string]string) (res slackRequest, err error) {
 
 func Authentication(token string) error {
 	if token != os.Getenv("KB_SLACK_TOKEN") {
-		return errors.New("token do not match!")
+		return errors.New("token do not match")
 	}
 
 	return nil
