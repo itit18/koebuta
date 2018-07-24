@@ -18,12 +18,16 @@ type Koebuta struct {
 }
 
 func (k *Koebuta) SetMode() (err error) {
-	switch m := os.Getenv("KB_MODE"); m {
-	case "outgoing":
-		k.mode = "outgoing"
-	case "incoming":
-		k.mode = "incoming"
-	default:
+	mode := os.Getenv("KB_MODE")
+	ary := [3]string{"outgoing", "incoming", "stock"}
+	for _, v := range ary {
+		if v == mode {
+			k.mode = mode
+			break
+		}
+	}
+
+	if len(k.mode) == 0 {
 		err = errors.New("mode unknown: set environment variable `KB_MODE`")
 	}
 	return
@@ -36,13 +40,15 @@ func (k *Koebuta) SetLambdaParams(params map[string]string) {
 func (k *Koebuta) Run() (err error) {
 	log.Printf("%s", "run")
 	log.Printf("%#v", k.lambdaParams)
-	switch m := os.Getenv("KB_MODE"); m {
+	switch k.mode {
 	case "outgoing":
 		err = k.outGoingHook(k.lambdaParams)
 	case "incoming":
 		err = k.inComingHook()
+	case "stock":
+		err = k.stock()
 	default:
-		err = errors.New("model unknown: set environment variable `KB_MODE`")
+		err = errors.New("mode unknown: execute `SetMode`")
 	}
 	return
 }
@@ -75,10 +81,13 @@ func (k *Koebuta) outGoingHook(params map[string]string) (err error) {
 		return
 	}
 
-	image, err := FetchImageURL()
+	iu := &ImageUrl{}
+	iu.SetExternalSites([]string{})
+	err = iu.FetchImageFromExternal()
 	if err != nil {
 		return
 	}
+	image := iu.GetRandom()
 
 	res, err := ConvertResponse(image)
 	if err != nil {
@@ -90,10 +99,13 @@ func (k *Koebuta) outGoingHook(params map[string]string) (err error) {
 }
 
 func (k *Koebuta) inComingHook() error {
-	image, err := FetchImageURL()
+	iu := &ImageUrl{}
+	iu.SetExternalSites([]string{})
+	err := iu.FetchImageFromExternal()
 	if err != nil {
 		return err
 	}
+	image := iu.GetRandom()
 
 	config := CreateIncomingConfig()
 	err = PostSlack(config, image)
@@ -102,5 +114,19 @@ func (k *Koebuta) inComingHook() error {
 	}
 
 	k.responseText = "success"
+	return nil
+}
+
+func (k *Koebuta) stock() error {
+	iu := &ImageUrl{}
+	iu.SetExternalSites([]string{})
+	err := iu.FetchImageFromExternal()
+	if err != nil {
+		return err
+	}
+	image := iu.GetRandom()
+	log.Println(image)
+	k.responseText = "success"
+
 	return nil
 }

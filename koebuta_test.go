@@ -24,3 +24,11 @@ func TestKoebuta_SetMode(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestStock(t *testing.T) {
+	k := Koebuta{}
+	err := k.stock()
+	if err != nil {
+		t.Error(err)
+	}
+}
