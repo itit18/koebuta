@@ -19,7 +19,7 @@ type Koebuta struct {
 
 func (k *Koebuta) SetMode() (err error) {
 	mode := os.Getenv("KB_MODE")
-	ary := [3]string{"outgoing", "incoming", "stock"}
+	ary := [4]string{"outgoing", "incoming", "stock", "simple"}
 	for _, v := range ary {
 		if v == mode {
 			k.mode = mode
@@ -47,6 +47,8 @@ func (k *Koebuta) Run() (err error) {
 		err = k.inComingHook()
 	case "stock":
 		err = k.stock()
+	case "simple":
+		err = k.simple()
 	default:
 		err = errors.New("mode unknown: execute `SetMode`")
 	}
@@ -127,6 +129,19 @@ func (k *Koebuta) stock() error {
 	image := iu.GetRandom()
 	log.Println(image)
 	k.responseText = "success"
+
+	return nil
+}
+
+func (k *Koebuta) simple() error {
+	iu := &ImageUrl{}
+	iu.SetExternalSites([]string{})
+	err := iu.FetchImageFromExternal()
+	if err != nil {
+		return err
+	}
+	image := iu.GetRandom()
+	k.responseText = image
 
 	return nil
 }
