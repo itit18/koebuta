@@ -7,6 +7,10 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+type RssClient interface {
+	Fetch(string) ([]string, error)
+}
+
 type CrawlClient struct {
 }
 

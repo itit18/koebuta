@@ -1,11 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"os"
 )
 
@@ -42,10 +40,14 @@ type incomingJSON struct {
 	Text      string `json:"text"`
 }
 
+type Slack struct {
+	client HttpCallInterface
+}
+
 // outgoing web hook
 
 //slackに対応したresponse形式に変換
-func ConvertResponse(msg string) (res SlackResponse, err error) {
+func (s *Slack) ConvertResponse(msg string) (res SlackResponse, err error) {
 	res = SlackResponse{
 		Text: msg,
 	}
@@ -54,7 +56,7 @@ func ConvertResponse(msg string) (res SlackResponse, err error) {
 }
 
 // AWS GWから渡ってくる値はmap型なのでstructに変換する
-func ConvertRequest(params map[string]string) (res SlackRequest, err error) {
+func (s *Slack) ConvertRequest(params map[string]string) (res SlackRequest, err error) {
 	res = SlackRequest{
 		Text:        params["text"],
 		UserID:      params["user_id"],
@@ -72,7 +74,7 @@ func ConvertRequest(params map[string]string) (res SlackRequest, err error) {
 	return
 }
 
-func Authentication(token string) error {
+func (s *Slack) Authentication(token string) error {
 	if token != os.Getenv("KB_SLACK_TOKEN") {
 		return errors.New("token do not match")
 	}
@@ -82,7 +84,7 @@ func Authentication(token string) error {
 
 // incoming web hook
 
-func PostSlack(config SlackConfig, body string) (err error) {
+func (s *Slack) Post(config SlackConfig, body string) (err error) {
 
 	//送信するJSONを作成
 	sendData := incomingJSON{
@@ -99,35 +101,12 @@ func PostSlack(config SlackConfig, body string) (err error) {
 	}
 
 	//送信処理
-	err = PostJSON(jsonBytes, config.URL)
+	err = s.client.PostJson(jsonBytes, config.URL)
 
 	return
 }
 
-func PostJSON(jsonBytes []byte, siteURL string) (err error) {
-	req, err := http.NewRequest(
-		"POST",
-		siteURL,
-		bytes.NewBuffer(jsonBytes),
-	)
-
-	if err != nil {
-		return
-	}
-	// Content-Type 設定
-	req.Header.Add("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	return
-}
-
-func CreateIncomingConfig() (config SlackConfig) {
+func (s *Slack) CreateIncomingConfig() (config SlackConfig) {
 	config = SlackConfig{
 		URL:       os.Getenv("KB_URL"),
 		Username:  os.Getenv("KB_USER"),

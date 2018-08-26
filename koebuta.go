@@ -80,13 +80,15 @@ func createImageUrl() *ImageUrl {
 }
 
 func (k *Koebuta) outGoingHook(params map[string]string) (err error) {
-	structParams, err := ConvertRequest(params)
+	slack := &Slack{}
+	slack.client = &HttpCaller{}
+	structParams, err := slack.ConvertRequest(params)
 	if err != nil {
 		return
 	}
 	log.Printf("%#v", structParams)
 
-	err = Authentication(structParams.Token)
+	err = slack.Authentication(structParams.Token)
 	if err != nil {
 		return
 	}
@@ -100,7 +102,7 @@ func (k *Koebuta) outGoingHook(params map[string]string) (err error) {
 	}
 	image := iu.GetRandom()
 
-	res, err := ConvertResponse(image)
+	res, err := slack.ConvertResponse(image)
 	if err != nil {
 		return
 	}
@@ -117,8 +119,10 @@ func (k *Koebuta) inComingHook() error {
 	}
 	image := iu.GetRandom()
 
-	config := CreateIncomingConfig()
-	err = PostSlack(config, image)
+	slack := &Slack{}
+	slack.client = &HttpCaller{}
+	config := slack.CreateIncomingConfig()
+	err = slack.Post(config, image)
 	if err != nil {
 		log.Fatal(err)
 	}

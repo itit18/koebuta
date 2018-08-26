@@ -1,13 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"testing"
 )
 
 func TestConvertResponse(t *testing.T) {
-	result, err := ConvertResponse("test")
+	slack := &Slack{}
+	result, err := slack.ConvertResponse("test")
 	if err != nil {
 		t.Error("ConvertResponse: error")
 	}
@@ -32,7 +32,8 @@ func TestConvertRequest(t *testing.T) {
 		"team_id":      "T11111111",
 	}
 
-	structParams, err := ConvertRequest(params)
+	slack := &Slack{}
+	structParams, err := slack.ConvertRequest(params)
 	if err != nil {
 		t.Error("ConvertRequest: error")
 	}
@@ -55,23 +56,5 @@ func TestConvertRequest(t *testing.T) {
 		t.Error("Generated struct are not equal")
 		log.Printf("%#v", expectParams)
 		log.Printf("%#v", structParams)
-	}
-}
-
-func TestPostJSON(t *testing.T) {
-	sendData := incomingJSON{
-		Channel:   "test1",
-		Username:  "test2",
-		IconEmoji: "test3",
-		Text:      "test4",
-	}
-	val, err := json.Marshal(sendData)
-	if err != nil {
-		t.Error("JSON Marshal error:", err)
-	}
-
-	err = PostJSON(val, "https://example.com/")
-	if err != nil {
-		t.Error("api clientが失敗しました")
 	}
 }
