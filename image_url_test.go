@@ -5,11 +5,17 @@ import (
 	"testing"
 )
 
-// TODO: 外部API依存の処理をなくす
-// FetchRSSがAPI依存している
-// ImageUrl.fetchでモック化されたFetchRSSが適当な値を返せばOK
+//RSS取得処理のモッククライアントを定義
+type MockRssClient struct{}
+
+func (c *MockRssClient) Fetch(url string) (imageList []string, err error) {
+	imageList = append(imageList, "hoge")
+	return
+}
+
 func TestImageUrl_FetchImageFromExternal(t *testing.T) {
 	iu := ImageUrl{}
+	iu.client = &MockRssClient{}
 	url := []string{
 		"http://maeda-toshiie.tumblr.com/rss",
 		"http://ktminamotokr.tumblr.com/rss",

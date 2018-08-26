@@ -71,7 +71,8 @@ func (iu *ImageUrl) GetRandom() string {
 }
 
 func (iu *ImageUrl) fetch(url string, c chan string, errChannel chan error, wg *sync.WaitGroup) {
-	list, err := iu.client.Fetch(url) //ここを直接呼び出さないようにする
+	list, err := iu.client.Fetch(url)
+	log.Print(list)
 	if err != nil {
 		errChannel <- err
 	}
