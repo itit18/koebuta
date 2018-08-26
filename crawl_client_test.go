@@ -17,5 +17,4 @@ func TestFetchRSS(t *testing.T) {
 	if expectValue[0:4] != "http" {
 		t.Error("返り値がURL出ない可能性がある")
 	}
-
 }

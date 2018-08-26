@@ -71,6 +71,14 @@ func (k *Koebuta) FormatResponseToLambda() (r SlackResponse, err error) {
 
 //private
 
+func createImageUrl() *ImageUrl {
+	url := &ImageUrl{}
+	url.client = &CrawlClient{}
+	url.SetExternalSites([]string{})
+
+	return url
+}
+
 func (k *Koebuta) outGoingHook(params map[string]string) (err error) {
 	structParams, err := ConvertRequest(params)
 	if err != nil {
@@ -83,7 +91,7 @@ func (k *Koebuta) outGoingHook(params map[string]string) (err error) {
 		return
 	}
 
-	iu := &ImageUrl{}
+	iu := createImageUrl()
 	iu.client = &CrawlClient{}
 	iu.SetExternalSites([]string{})
 	err = iu.FetchImageFromExternal()
@@ -102,8 +110,7 @@ func (k *Koebuta) outGoingHook(params map[string]string) (err error) {
 }
 
 func (k *Koebuta) inComingHook() error {
-	iu := &ImageUrl{}
-	iu.SetExternalSites([]string{})
+	iu := createImageUrl()
 	err := iu.FetchImageFromExternal()
 	if err != nil {
 		return err
@@ -121,8 +128,7 @@ func (k *Koebuta) inComingHook() error {
 }
 
 func (k *Koebuta) stock() error {
-	iu := &ImageUrl{}
-	iu.SetExternalSites([]string{})
+	iu := createImageUrl()
 	err := iu.FetchImageFromExternal()
 	if err != nil {
 		return err
@@ -135,8 +141,7 @@ func (k *Koebuta) stock() error {
 }
 
 func (k *Koebuta) simple() error {
-	iu := &ImageUrl{}
-	iu.SetExternalSites([]string{})
+	iu := createImageUrl()
 	err := iu.FetchImageFromExternal()
 	if err != nil {
 		return err
