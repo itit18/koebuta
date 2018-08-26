@@ -92,8 +92,9 @@ func PostSlack(config SlackConfig, body string) (err error) {
 		Text:      body,
 	}
 
-	jsonBytes, err := CreateJSON(sendData)
+	jsonBytes, err := json.Marshal(sendData)
 	if err != nil {
+		fmt.Println("JSON Marshal error:", err)
 		return
 	}
 
@@ -132,16 +133,6 @@ func CreateIncomingConfig() (config SlackConfig) {
 		Username:  os.Getenv("KB_USER"),
 		IconEmoji: os.Getenv("KB_ICON"),
 		Channel:   os.Getenv("KB_CHANNEL"),
-	}
-
-	return
-}
-
-func CreateJSON(sendData incomingJSON) (jsonBytes []byte, err error) {
-	jsonBytes, err = json.Marshal(sendData)
-	if err != nil {
-		fmt.Println("JSON Marshal error:", err)
-		return
 	}
 
 	return

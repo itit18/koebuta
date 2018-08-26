@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"testing"
 )
@@ -64,7 +65,10 @@ func TestPostJSON(t *testing.T) {
 		IconEmoji: "test3",
 		Text:      "test4",
 	}
-	val, err := CreateJSON(sendData)
+	val, err := json.Marshal(sendData)
+	if err != nil {
+		t.Error("JSON Marshal error:", err)
+	}
 
 	err = PostJSON(val, "https://example.com/")
 	if err != nil {
