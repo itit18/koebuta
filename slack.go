@@ -2,8 +2,9 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
-	"log"
+	"fmt"
 	"net/http"
 	"os"
 )
@@ -90,6 +91,7 @@ func PostSlack(config SlackConfig, body string) (err error) {
 		IconEmoji: config.IconEmoji,
 		Text:      body,
 	}
+
 	jsonBytes, err := CreateJSON(sendData)
 	if err != nil {
 		return
@@ -102,9 +104,6 @@ func PostSlack(config SlackConfig, body string) (err error) {
 }
 
 func PostJSON(jsonBytes []byte, siteURL string) (err error) {
-	log.Print(siteURL)
-	log.Print(string(jsonBytes))
-
 	req, err := http.NewRequest(
 		"POST",
 		siteURL,
@@ -133,6 +132,16 @@ func CreateIncomingConfig() (config SlackConfig) {
 		Username:  os.Getenv("KB_USER"),
 		IconEmoji: os.Getenv("KB_ICON"),
 		Channel:   os.Getenv("KB_CHANNEL"),
+	}
+
+	return
+}
+
+func CreateJSON(sendData incomingJSON) (jsonBytes []byte, err error) {
+	jsonBytes, err = json.Marshal(sendData)
+	if err != nil {
+		fmt.Println("JSON Marshal error:", err)
+		return
 	}
 
 	return

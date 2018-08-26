@@ -84,6 +84,7 @@ func (k *Koebuta) outGoingHook(params map[string]string) (err error) {
 	}
 
 	iu := &ImageUrl{}
+	iu.client = &CrawlClient{}
 	iu.SetExternalSites([]string{})
 	err = iu.FetchImageFromExternal()
 	if err != nil {

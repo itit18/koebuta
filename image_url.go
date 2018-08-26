@@ -10,6 +10,7 @@ import (
 type ImageUrl struct {
 	list          []string
 	externalSites []string
+	client        RssClient
 }
 
 //TODO: 動作テストする / もしくはちゃんとテスト書く
@@ -70,7 +71,7 @@ func (iu *ImageUrl) GetRandom() string {
 }
 
 func (iu *ImageUrl) fetch(url string, c chan string, errChannel chan error, wg *sync.WaitGroup) {
-	list, err := FetchRSS(url)
+	list, err := iu.client.Fetch(url) //ここを直接呼び出さないようにする
 	if err != nil {
 		errChannel <- err
 	}

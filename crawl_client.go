@@ -1,16 +1,16 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-func FetchRSS(url string) (imageList []string, err error) {
+type CrawlClient struct {
+}
 
+func (c *CrawlClient) Fetch(url string) (imageList []string, err error) {
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
 		return
@@ -21,18 +21,8 @@ func FetchRSS(url string) (imageList []string, err error) {
 	for i := range selecter.Nodes {
 		node := selecter.Eq(i)
 		text := node.Text()
-		list := fetchDescription(text)
+		list := c.fetchDescription(text)
 		imageList = append(imageList, list...)
-	}
-
-	return
-}
-
-func CreateJSON(sendData incomingJSON) (jsonBytes []byte, err error) {
-	jsonBytes, err = json.Marshal(sendData)
-	if err != nil {
-		fmt.Println("JSON Marshal error:", err)
-		return
 	}
 
 	return
@@ -40,7 +30,7 @@ func CreateJSON(sendData incomingJSON) (jsonBytes []byte, err error) {
 
 //private
 
-func fetchDescription(text string) (imageList []string) {
+func (c *CrawlClient) fetchDescription(text string) (imageList []string) {
 	r := strings.NewReader(text)
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {

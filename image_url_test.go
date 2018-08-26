@@ -5,7 +5,9 @@ import (
 	"testing"
 )
 
-//TODO: 外部API依存の処理をなくす
+// TODO: 外部API依存の処理をなくす
+// FetchRSSがAPI依存している
+// ImageUrl.fetchでモック化されたFetchRSSが適当な値を返せばOK
 func TestImageUrl_FetchImageFromExternal(t *testing.T) {
 	iu := ImageUrl{}
 	url := []string{
